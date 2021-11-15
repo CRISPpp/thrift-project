@@ -3,3 +3,4 @@
 #匹配机制通过等待时间和分差的权值不断更新
 #客户端的match数据服务实现在AC TERMINAL上，端口为9090
 #md5sum加密方法，md5sum进入命令行，输入密码换行，ctrl+d取前八位
+#save_result线程操作必须在我的acterminal上的server才能正常进行，如果要正常运行得修改连接路径
