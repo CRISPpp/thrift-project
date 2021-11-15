@@ -2,10 +2,13 @@
 // You should copy it to another filename to avoid overwriting it.
 //先编译g++ -c 后链接g++ *.o -o main -lthrift -pthread
 #include "match_server/Match.h"
+#include "save_client/Save.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -19,7 +22,7 @@ using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
 
 using namespace  ::match_service;
-
+using namespace  ::save_service;
 
 struct Task{
     User user;
@@ -35,9 +38,21 @@ struct MessageQueue{
 
 class Pool{
     public:
-        
+
         void save_result(int a, int b){
             cout << "Match result " << a << ", " << b << endl;
+            std::shared_ptr<TTransport> socket(new TSocket("123.57.47.211", 9090));//这是我在acterminal上的ip地址
+            std::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+            std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+            SaveClient client(protocol);
+
+            try {
+                transport->open();
+                client.save_data("acs_1740", "c24038al", a, b);
+                transport->close();
+            } catch (TException& tx) {
+                cout << "ERROR: " << tx.what() << endl;
+            }
         }
 
         void match(){
@@ -96,7 +111,7 @@ void consume_task(){
         unique_lock<mutex> lck(message_queue.m);
         if(message_queue.q.empty()){
             message_queue.cv.wait(lck);
-            
+
         }
         else{
             auto task = message_queue.q.front();
