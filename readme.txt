@@ -1,3 +1,4 @@
 #跟y总学linux时模仿的一个thrift项目
 #主要通过编写客户端match_service以及客户端client实现匹配机制
 #匹配机制通过等待时间和分差的权值不断更新
+#客户端的match数据服务实现在AC TERMINAL上，端口为9090
